@@ -132,16 +132,11 @@ short int minDistance = 20; // 20cm default height without calibration
 
 void loop() {
 
-  buttonState = digitalRead(BTN);
-
-  if (buttonState != lastButtonState) {
-    if (buttonState == HIGH) {
+	if (digitalRead(BTN) == HIGH) {
       displayCalibrate();
       minDistance = calibrate();
-    }
-    delay(50);
-  }
-  lastButtonState = buttonState;
+	  delay(100);
+	}
 
   int duration;
   int distance;
