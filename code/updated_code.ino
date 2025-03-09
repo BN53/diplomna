@@ -24,9 +24,10 @@
 
 
 const int dig1Pins[] = { A_DIG1, B_DIG1, C_DIG1, D_DIG1, E_DIG1, F_DIG1, G_DIG1 };
+
 const int dig2Pins[] = { A_DIG2, B_DIG2, C_DIG2, D_DIG2, E_DIG2, F_DIG2, G_DIG2 };
 
-const byte numbers[19] = {
+const byte numbers[10] = {
   0b0111111, // 0
   0b0000110, // 1
   0b1011011, // 2
@@ -108,6 +109,17 @@ void calculatePace(){
   showPace(pace);
 }
 
+short int getDistance(){
+  digitalWrite(TRIG, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG, LOW);
+
+  int duration = pulseIn(ECHO, HIGH);
+  return (duration * 0.0343) / 2;
+}
+
 short int calibrate(){
 
   for(int i = 0; i < 5; i++){
@@ -116,18 +128,10 @@ short int calibrate(){
     digitalWrite(BUZZ, LOW);
     delay(1000);
   }
-  digitalWrite(TRIG, LOW);
-  delayMicroseconds(2); // making sure the trigger is in low first
-  digitalWrite(TRIG, HIGH);
-  delayMicroseconds(10); // minimum needed delay
-  digitalWrite(TRIG, LOW);
-
-  int duration = pulseIn(ECHO, HIGH);
-  return (duration * 0.0343) / 2;
+  return getDistance();
 }
 
-int buttonState = 0;
-int lastButtonState = 0;
+
 short int minDistance = 20; // 20cm default height without calibration
 
 void loop() {
@@ -138,24 +142,10 @@ void loop() {
 	  delay(100);
 	}
 
-  int duration;
-  int distance;
-
-  digitalWrite(TRIG, LOW);
-  delayMicroseconds(2); // making sure the trigger is in low first
-  digitalWrite(TRIG, HIGH);
-  delayMicroseconds(10); // minimum needed delay
-  digitalWrite(TRIG, LOW);
-
-  duration = pulseIn(ECHO, HIGH);
-  if(duration != 0){
-    calculatePace();
-    distance = (duration * 0.0343) / 2;
-    if(distance < minDistance){
-      digitalWrite(BUZZ, HIGH);
-      delay(200);
-      digitalWrite(BUZZ, LOW);
-    }
+  if(getDistance() < minDistance){
+    digitalWrite(BUZZ, HIGH);
+    delay(300);
+    digitalWrite(BUZZ, LOW);
   }
-
+  calculatePace();
 }
